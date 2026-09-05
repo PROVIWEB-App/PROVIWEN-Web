@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://proviweb-d8764-c592e.web.app/">Sitio web</a> •
-  <a href="https://proviweb-d8764-c592e.web.app/docs-sso.html">Documentación SSO</a> •
+  <a href="https://proviweb.com/">Sitio web</a> •
+  <a href="https://proviweb.com/docs-sso.html">Documentación SSO</a> •
   <a href="https://github.com/PROVIWEB-App/PROVIWEB-Public">Aplicación Android</a>
 </p>
 
@@ -55,7 +55,7 @@ La versión pública del sitio está desplegada mediante **Firebase Hosting**.
 
 ### Sitio oficial
 
-https://proviweb-d8764-c592e.web.app/
+https://proviweb.com/
 
 La landing presenta:
 
@@ -207,7 +207,7 @@ Incluye información sobre:
 
 ### Documentación online
 
-https://proviweb-d8764-c592e.web.app/docs-sso.html
+https://proviweb.com/docs-sso.html
 
 ---
 
@@ -243,7 +243,7 @@ Entre sus responsabilidades se encuentran:
 ## Authorization Endpoint
 
 ```text
-https://proviweb-d8764-c592e.web.app/oauth-authorize.html
+https://proviweb.com/oauth-authorize.html
 ```
 
 Este endpoint inicia el proceso de autenticación y autorización.
@@ -261,7 +261,7 @@ POST
 Endpoint:
 
 ```text
-https://proviweb-d8764-c592e.web.app/oauth/token
+https://projectname/oauth/token
 ```
 
 Se utiliza para intercambiar un authorization code por las credenciales necesarias para autenticar al usuario en la aplicación cliente.
@@ -396,7 +396,7 @@ Las aplicaciones deben generar y validar un valor `state` para proteger el callb
 # 🔗 Ejemplo de autorización
 
 ```text
-https://proviweb-d8764-c592e.web.app/oauth-authorize.html
+https://projectname/oauth-authorize.html
 ?client_id=mi.app.tercero
 &redirect_uri=https%3A%2F%2Fmi-dominio.com%2Foauth%2Fcallback
 &response_type=code
@@ -411,7 +411,7 @@ https://proviweb-d8764-c592e.web.app/oauth-authorize.html
 # 🔄 Ejemplo de Token Exchange
 
 ```bash
-curl -X POST "https://proviweb-d8764-c592e.web.app/oauth/token" \
+curl -X POST "https://projectname/oauth/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=authorization_code" \
   -d "client_id=mi.app.tercero" \
@@ -443,29 +443,29 @@ El ecosistema PROVIWEB contempla actualmente clientes oficiales con callbacks es
 ### PROVIWEB
 
 ```text
-com.israviolink.app
+com.project.a
 proviweb://oauth/callback/app
 ```
 
 ### PROVIWEB Admin
 
 ```text
-com.israviolink.admin
-israviolink-admin://oauth/callback
+com.project.b
+projectname-b://oauth/callback
 ```
 
 ### PROVIWEB Nunti
 
 ```text
-com.israviolink.nunti
-proviweb-nunti://oauth/callback
+com.project.c
+projectname-c://oauth/callback
 ```
 
 ### PROVIWEB Pulso
 
 ```text
-com.israviolink.pulso
-proviweb-pulso://oauth/callback
+com.project.d
+projectname-d://oauth/callback
 ```
 
 Los `redirect_uri` deben mantenerse exactamente iguales a los valores registrados para cada cliente.
