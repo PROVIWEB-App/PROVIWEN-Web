@@ -642,4 +642,3 @@ PROVIWEB busca construir un ecosistema digital donde artistas, músicos, aplicac
 ## 📄 Licencia
 
 Consulta los archivos de licencia incluidos en este repositorio para conocer los términos aplicables al uso y distribución del proyecto.
-

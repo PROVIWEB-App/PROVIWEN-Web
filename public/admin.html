@@ -276,6 +276,50 @@
         }
         input:checked + .slider-round { background-color: #22c55e; }
         input:checked + .slider-round:before { transform: translateX(24px); }
+
+        .auth-gate-wrap {
+            max-width: 560px;
+            margin: 28px auto 0;
+            padding: 0 16px;
+        }
+
+        .auth-gate-card {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+        }
+
+        .auth-gate-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .auth-gate-tab {
+            border: 1px solid var(--border-glass);
+            background: rgba(255,255,255,0.05);
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 9px 10px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .auth-gate-tab.active {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            background: rgba(251,191,36,0.1);
+        }
+
+        .auth-gate-note {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin: 8px 0 12px;
+        }
     </style>
 </head>
 <body>
@@ -293,12 +337,67 @@
                 🏢 Aprobación de Marcas
             </a>
             <div id="adminUserStatus" style="font-size: 12px; font-weight: 800; color: #4ade80; background: rgba(34, 197, 94, 0.15); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.35);">
-                👑 Super Admin
+                🔒 Acceso restringido
             </div>
+            <button type="button" id="btnAdminLogout" class="admin-back-btn" style="display:none; cursor:pointer; color:#f87171; border-color:rgba(248,113,113,0.35); background:rgba(248,113,113,0.1);">
+                ⎋ Cerrar sesión
+            </button>
         </div>
     </header>
 
-    <main class="admin-container">
+    <div id="adminAuthGate" class="auth-gate-wrap">
+        <div class="auth-gate-card">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <span style="font-size:20px;">🛡️</span>
+                <h2 style="font-size:18px; font-weight:900; color:#fff;">Acceso a Consola Admin</h2>
+            </div>
+            <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5; margin-bottom:12px;">
+                Para ingresar a esta consola debes iniciar sesión o registrarte como <strong>marca o tercero integrador</strong> en PROVIWEB Connect.
+            </p>
+            <div class="auth-gate-tabs">
+                <button type="button" class="auth-gate-tab active" id="btnTabLogin">🔑 Iniciar sesión</button>
+                <button type="button" class="auth-gate-tab" id="btnTabRegister">🏢 Registro marcas/terceros</button>
+            </div>
+            <form id="adminAuthForm">
+                <div class="form-group" id="adminRegisterNameGroup" style="display:none;">
+                    <label>Nombre de contacto:</label>
+                    <input type="text" id="adminRegisterName" class="form-input" placeholder="Nombre responsable">
+                </div>
+                <div class="form-group" id="adminRegisterOrgGroup" style="display:none;">
+                    <label>Marca / Empresa / Proyecto:</label>
+                    <input type="text" id="adminRegisterOrg" class="form-input" placeholder="Ej: Academia Sonata / MiApp Labs">
+                </div>
+                <div class="form-group" id="adminRegisterTypeGroup" style="display:none;">
+                    <label>Tipo de solicitante:</label>
+                    <select id="adminRegisterType" class="form-input">
+                        <option value="">Selecciona una opción</option>
+                        <option value="brand">Marca</option>
+                        <option value="third_party_app">App de terceros</option>
+                        <option value="third_party_web">Sitio web de terceros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Correo electrónico:</label>
+                    <input type="email" id="adminAuthEmail" class="form-input" placeholder="tu@correo.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña:</label>
+                    <input type="password" id="adminAuthPassword" class="form-input" placeholder="Tu contraseña" required>
+                </div>
+                <div class="form-group" id="adminRegisterConfirmGroup" style="display:none;">
+                    <label>Confirmar contraseña:</label>
+                    <input type="password" id="adminAuthPasswordConfirm" class="form-input" placeholder="Repite tu contraseña">
+                </div>
+                <div id="adminAuthHint" class="auth-gate-note">Inicia sesión para acceder a la consola.</div>
+                <div id="adminAccessWarning" class="auth-gate-note" style="display:none; color:#fca5a5; margin-top:-4px;"></div>
+                <button type="submit" id="btnAdminAuthSubmit" class="admin-back-btn" style="width:100%; justify-content:center; background:var(--gradient-admin); color:#000; font-weight:900; border:none; padding:10px; cursor:pointer;">
+                    🔑 Iniciar sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <main class="admin-container" id="adminConsole" style="display:none;">
         <!-- HERO -->
         <div class="admin-hero">
             <div>
@@ -685,6 +784,26 @@
         document.addEventListener('DOMContentLoaded', () => {
             const auth = firebase.auth();
             const db = firebase.database();
+            const authGate = document.getElementById('adminAuthGate');
+            const adminConsole = document.getElementById('adminConsole');
+            const adminUserStatus = document.getElementById('adminUserStatus');
+            const btnAdminLogout = document.getElementById('btnAdminLogout');
+            const adminAuthForm = document.getElementById('adminAuthForm');
+            const btnAdminAuthSubmit = document.getElementById('btnAdminAuthSubmit');
+            const btnTabLogin = document.getElementById('btnTabLogin');
+            const btnTabRegister = document.getElementById('btnTabRegister');
+            const adminRegisterNameGroup = document.getElementById('adminRegisterNameGroup');
+            const adminRegisterOrgGroup = document.getElementById('adminRegisterOrgGroup');
+            const adminRegisterTypeGroup = document.getElementById('adminRegisterTypeGroup');
+            const adminRegisterConfirmGroup = document.getElementById('adminRegisterConfirmGroup');
+            const adminRegisterName = document.getElementById('adminRegisterName');
+            const adminRegisterOrg = document.getElementById('adminRegisterOrg');
+            const adminRegisterType = document.getElementById('adminRegisterType');
+            const adminAuthEmail = document.getElementById('adminAuthEmail');
+            const adminAuthPassword = document.getElementById('adminAuthPassword');
+            const adminAuthPasswordConfirm = document.getElementById('adminAuthPasswordConfirm');
+            const adminAuthHint = document.getElementById('adminAuthHint');
+            const adminAccessWarning = document.getElementById('adminAccessWarning');
 
             const topBar = document.getElementById('topScreenProgressBar');
             function triggerScreenLoading() {
@@ -698,6 +817,124 @@
                 }, 350);
             }
             triggerScreenLoading();
+
+            let authMode = 'login';
+            let adminFeaturesStarted = false;
+            const OAUTH_ACCESS_NODE = 'OAuthServiceRegistrations';
+
+            async function isSuperAdminUser(user) {
+                if (!user) return false;
+                const email = (user.email || '').toLowerCase();
+                if (email === 'viwebpro@gmail.com') return true;
+                const adminSnap = await db.ref(`Admin/${user.uid}`).once('value');
+                return adminSnap.exists();
+            }
+
+            async function getPartnerAccessRecord(user) {
+                if (!user) return null;
+                const snap = await db.ref(`${OAUTH_ACCESS_NODE}/${user.uid}`).once('value');
+                return snap.exists() ? snap.val() : null;
+            }
+
+            async function registerPartnerAccess(user, profile) {
+                if (!user) throw new Error('No se pudo crear una sesión válida.');
+                const now = Date.now();
+                await db.ref(`${OAUTH_ACCESS_NODE}/${user.uid}`).set({
+                    uid: user.uid,
+                    email: user.email || profile.email || '',
+                    contactName: profile.contactName,
+                    organization: profile.organization,
+                    registrantType: profile.registrantType,
+                    service: 'proviweb_connect',
+                    status: 'active',
+                    createdAt: now,
+                    updatedAt: now
+                });
+            }
+
+            function setAuthMode(mode) {
+                authMode = mode === 'register' ? 'register' : 'login';
+                const registering = authMode === 'register';
+                adminRegisterNameGroup.style.display = registering ? 'block' : 'none';
+                adminRegisterOrgGroup.style.display = registering ? 'block' : 'none';
+                adminRegisterTypeGroup.style.display = registering ? 'block' : 'none';
+                adminRegisterConfirmGroup.style.display = registering ? 'block' : 'none';
+                adminRegisterName.required = registering;
+                adminRegisterOrg.required = registering;
+                adminRegisterType.required = registering;
+                adminAuthPasswordConfirm.required = registering;
+                adminAccessWarning.style.display = 'none';
+                adminAccessWarning.textContent = '';
+                adminAuthHint.textContent = registering
+                    ? 'Registro exclusivo para marcas y terceros que integran PROVIWEB Connect.'
+                    : 'Inicia sesión con una cuenta ya registrada para este servicio.';
+                btnAdminAuthSubmit.innerHTML = registering ? '🏢 Registrar acceso de tercero' : '🔑 Iniciar sesión';
+                btnTabLogin.classList.toggle('active', !registering);
+                btnTabRegister.classList.toggle('active', registering);
+            }
+
+            btnTabLogin.onclick = () => setAuthMode('login');
+            btnTabRegister.onclick = () => setAuthMode('register');
+            const gateEntry = new URLSearchParams(window.location.search).get('entry');
+            setAuthMode(gateEntry === 'partner' ? 'register' : 'login');
+
+            adminAuthForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const email = adminAuthEmail.value.trim();
+                const password = adminAuthPassword.value;
+                const name = adminRegisterName.value.trim();
+                const organization = adminRegisterOrg.value.trim();
+                const registrantType = adminRegisterType.value;
+                const confirmPassword = adminAuthPasswordConfirm.value;
+                btnAdminAuthSubmit.disabled = true;
+                btnAdminAuthSubmit.innerHTML = authMode === 'register' ? '⏳ Registrando acceso...' : '⏳ Iniciando sesión...';
+                try {
+                    if (authMode === 'register') {
+                        if (name.length < 2) throw new Error('Ingresa un nombre de contacto válido.');
+                        if (organization.length < 2) throw new Error('Ingresa el nombre de la marca, empresa o proyecto.');
+                        if (!registrantType) throw new Error('Selecciona el tipo de solicitante.');
+                        if (password.length < 6) throw new Error('La contraseña debe tener al menos 6 caracteres.');
+                        if (password !== confirmPassword) throw new Error('Las contraseñas no coinciden.');
+
+                        let current = auth.currentUser;
+                        if (!current) {
+                            try {
+                                await auth.createUserWithEmailAndPassword(email, password);
+                            } catch (createError) {
+                                if (createError && createError.code === 'auth/email-already-in-use') {
+                                    await auth.signInWithEmailAndPassword(email, password);
+                                } else {
+                                    throw createError;
+                                }
+                            }
+                            current = auth.currentUser;
+                        } else if ((current.email || '').toLowerCase() !== email.toLowerCase()) {
+                            throw new Error('Debes usar el mismo correo de la sesión iniciada para registrar el acceso.');
+                        }
+
+                        await registerPartnerAccess(current, {
+                            email,
+                            contactName: name,
+                            organization,
+                            registrantType
+                        });
+                    } else {
+                        await auth.signInWithEmailAndPassword(email, password);
+                    }
+                } catch (error) {
+                    alert((authMode === 'register' ? 'No se pudo completar el registro para terceros: ' : 'No se pudo iniciar sesión: ') + (error.message || 'Intenta de nuevo.'));
+                    btnAdminAuthSubmit.disabled = false;
+                    btnAdminAuthSubmit.innerHTML = authMode === 'register' ? '🏢 Registrar acceso de tercero' : '🔑 Iniciar sesión';
+                }
+            };
+
+            btnAdminLogout.onclick = async () => {
+                await auth.signOut();
+            };
+
+            function startAdminFeatures() {
+                if (adminFeaturesStarted) return;
+                adminFeaturesStarted = true;
 
             // Tabs
             const tabBtns = document.querySelectorAll('.admin-tab-btn');
@@ -1002,6 +1239,42 @@
                 const count = snap.exists() ? (snap.numChildren() + baseOfficialClients) : baseOfficialClients;
                 const countEl = document.getElementById('countOAuthClients');
                 if (countEl) countEl.textContent = count.toString();
+            });
+            }
+
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    btnAdminLogout.style.display = 'inline-flex';
+                    btnAdminAuthSubmit.disabled = false;
+
+                    const superAdmin = await isSuperAdminUser(user);
+                    const partnerAccess = superAdmin ? { registrantType: 'super_admin' } : await getPartnerAccessRecord(user);
+
+                    if (superAdmin || partnerAccess) {
+                        authGate.style.display = 'none';
+                        adminConsole.style.display = 'block';
+                        const roleLabel = superAdmin ? 'Super Admin' : (partnerAccess.registrantType || 'tercero');
+                        adminUserStatus.textContent = `✅ ${user.email} · ${roleLabel}`;
+                        startAdminFeatures();
+                        return;
+                    }
+
+                    adminConsole.style.display = 'none';
+                    authGate.style.display = 'block';
+                    adminUserStatus.textContent = '⛔ Cuenta sin registro de servicio';
+                    adminAccessWarning.textContent = 'Esta cuenta no está registrada para PROVIWEB Connect. Debes completar el registro de marca/tercero para acceder.';
+                    adminAccessWarning.style.display = 'block';
+                    setAuthMode('register');
+                    adminAuthEmail.value = user.email || '';
+                    btnAdminAuthSubmit.innerHTML = '🏢 Registrar acceso de tercero';
+                } else {
+                    adminConsole.style.display = 'none';
+                    authGate.style.display = 'block';
+                    btnAdminLogout.style.display = 'none';
+                    adminUserStatus.textContent = '🔒 Acceso restringido';
+                    btnAdminAuthSubmit.disabled = false;
+                    btnAdminAuthSubmit.innerHTML = authMode === 'register' ? '🏢 Registrar acceso de tercero' : '🔑 Iniciar sesión';
+                }
             });
 
         });

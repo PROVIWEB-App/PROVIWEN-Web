@@ -197,7 +197,8 @@
 
         .header-content {
             display: grid;
-            grid-template-columns: auto minmax(0, 1fr) auto;
+            grid-template-columns: auto auto auto;
+            justify-content: space-between;
             align-items: center;
             gap: 16px;
             width: 100%;
@@ -287,6 +288,64 @@
             padding: 10px 16px;
             font-size: 0.9rem;
             white-space: nowrap;
+        }
+
+        .header-shortcuts {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .header-shortcuts summary {
+            list-style: none;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid var(--border-glass);
+            background: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+            border-radius: 11px;
+            padding: 9px 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .header-shortcuts summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .header-shortcuts[open] summary {
+            border-color: var(--accent-purple);
+            background: rgba(168, 85, 247, 0.15);
+        }
+
+        .header-shortcuts-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            width: min(300px, 90vw);
+            border-radius: 14px;
+            border: 1px solid var(--border-glass);
+            background: rgba(13, 13, 20, 0.98);
+            backdrop-filter: blur(14px);
+            padding: 8px;
+            display: grid;
+            gap: 6px;
+            z-index: 1200;
+            box-shadow: 0 14px 40px rgba(0,0,0,0.45);
+        }
+
+        .header-shortcuts-menu a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 9px 10px;
+            transition: var(--transition);
+        }
+
+        .header-shortcuts-menu a:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         /* ===== HERO ===== */
@@ -2199,6 +2258,96 @@
             flex-wrap: wrap;
         }
 
+        /* ===== PROVIWEB CONNECT SECTION ===== */
+        .connect-section {
+            background: linear-gradient(180deg, rgba(10, 18, 32, 0.95) 0%, rgba(14, 14, 22, 0.96) 100%);
+            border-top: 1px solid rgba(56, 189, 248, 0.2);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+            position: relative;
+        }
+
+        .connect-shell {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.11) 0%, rgba(139, 92, 246, 0.12) 55%, rgba(34, 197, 94, 0.1) 100%);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 24px;
+            padding: clamp(22px, 3vw, 34px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 20px;
+        }
+
+        .connect-title {
+            font-size: clamp(1.7rem, 3.4vw, 2.35rem);
+            line-height: 1.12;
+            margin-bottom: 10px;
+        }
+
+        .connect-desc {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 760px;
+        }
+
+        .connect-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .connect-tag {
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            padding: 7px 11px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            background: rgba(15, 23, 42, 0.5);
+            color: #cbd5e1;
+        }
+
+        .connect-actions {
+            margin-top: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .connect-links {
+            display: grid;
+            gap: 10px;
+            align-content: start;
+        }
+
+        .connect-link-card {
+            display: block;
+            text-decoration: none;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 14px;
+            padding: 12px 13px;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .connect-link-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(56, 189, 248, 0.6);
+            background: rgba(30, 41, 59, 0.65);
+        }
+
+        .connect-link-card strong {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .connect-link-card span {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
         /* ===== FOOTER ===== */
         .footer {
             background: var(--bg-secondary);
@@ -2272,14 +2421,6 @@
                 height: 34px;
             }
 
-            .nav-links {
-                gap: 12px;
-            }
-
-            .nav-links a {
-                font-size: 0.84rem;
-            }
-
             .header-actions {
                 gap: 8px;
             }
@@ -2288,34 +2429,31 @@
                 padding: 8px 12px;
                 font-size: 0.8rem;
             }
+
+            .header-actions {
+                display: none;
+            }
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 980px) {
             .header-content {
-                grid-template-columns: minmax(0, 1fr) auto;
+                grid-template-columns: auto 1fr;
+                gap: 8px;
             }
 
-            .nav-links {
-                display: none;
+            .header-actions {
+                justify-self: end;
+            }
+
+            .header-actions .btn {
+                padding: 8px 10px;
+                font-size: 0.76rem;
             }
         }
 
         @media (max-width: 1024px) {
             .container {
                 padding: 0 16px;
-            }
-
-            .nav-links {
-                gap: 14px;
-            }
-
-            .nav-links a {
-                font-size: 0.88rem;
-            }
-
-            .header-actions .btn {
-                padding: 9px 13px;
-                font-size: 0.84rem;
             }
 
             .features-grid,
@@ -2351,8 +2489,32 @@
         }
 
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
+            .header {
+                height: 78px;
+            }
+
+            .header-content {
+                grid-template-columns: 1fr;
+                gap: 7px;
+                justify-items: center;
+                padding: 8px 0;
+            }
+
+            .header-actions {
+                gap: 8px;
+            }
+
+            .header-shortcuts {
+                width: 100%;
+                max-width: 320px;
+            }
+
+            .header-shortcuts summary {
+                text-align: center;
+            }
+
+            .connect-shell {
+                grid-template-columns: 1fr;
             }
 
             .section {
@@ -4323,15 +4485,20 @@
                 <img src="./assets/logotransparente-1dd37ce8-1dd37ce8.png" alt="PROVIWEB">
                 <span class="gradient-text-animate">PROVIWEB</span>
             </a>
-            <nav class="nav-links">
-                <a href="#features">Características</a>
-                <a href="#app-funciones">Funciones App</a>
-                <a href="#venues">🏠 Establecimientos</a>
-                <a href="#games">Juegos</a>
-                <a href="#qav">QAV Token</a>
-                <a href="#brands">🏢 Marcas</a>
-                <a href="#team">Equipo</a>
-            </nav>
+            <details class="header-shortcuts">
+                <summary>⚡ Atajos rápidos</summary>
+                <nav class="header-shortcuts-menu">
+                    <a href="#features">Características</a>
+                    <a href="#app-funciones">Funciones App</a>
+                    <a href="#login">Iniciar sesión</a>
+                    <a href="register.html">Crear cuenta</a>
+                    <a href="#connect">Integrar PROVIWEB Connect</a>
+                    <a href="docs-sso.html">Guía SSO para terceros</a>
+                    <a href="admin.html">Consola Admin</a>
+                    <a href="#games">Juegos</a>
+                    <a href="#qav">QAV Token</a>
+                </nav>
+            </details>
             <div class="header-actions">
                 <a href="#login" class="btn btn-secondary">Iniciar sesión</a>
                 <a href="register.html" class="btn btn-primary">Crear cuenta</a>
@@ -5461,6 +5628,47 @@
             <div class="cta-buttons-row">
                 <a href="register.html" class="btn btn-primary btn-large magnetic-btn rubber-hover pulse-glow neon-glow particle-explosion">Crear cuenta gratis →</a>
                 <a href="#login" class="btn btn-secondary btn-large magnetic-btn swing-hover liquid-hover">Ya tengo cuenta</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-reveal connect-section" id="connect">
+        <div class="container">
+            <div class="connect-shell">
+                <div>
+                    <span class="section-label">Integración para terceros</span>
+                    <h2 class="connect-title">
+                        Implementa <span class="gradient-text-animate">Iniciar sesión con PROVIWEB</span> en tu app o sitio
+                    </h2>
+                    <p class="connect-desc">
+                        Registra tu cliente OAuth, define tu callback y conecta tu plataforma con PROVIWEB Connect.
+                        El flujo ya incluye autorización explícita del usuario, PKCE y retorno seguro al tercero.
+                    </p>
+                    <div class="connect-tags">
+                        <span class="connect-tag">OAuth 2.0 Code Flow</span>
+                        <span class="connect-tag">PKCE S256</span>
+                        <span class="connect-tag">Scopes: profile, email, qav</span>
+                        <span class="connect-tag">Apps + Sitios Web</span>
+                    </div>
+                    <div class="connect-actions">
+                        <a href="docs-sso.html" class="btn btn-primary">Ver guía técnica</a>
+                        <a href="admin.html" class="btn btn-secondary">Consola admin</a>
+                    </div>
+                </div>
+                <div class="connect-links">
+                    <a class="connect-link-card" href="oauth-authorize.html">
+                        <strong>Portal de autorización</strong>
+                        <span>Pantalla de login/registro + consentimiento OAuth</span>
+                    </a>
+                    <a class="connect-link-card" href="docs-sso.html">
+                        <strong>Documentación de integración</strong>
+                        <span>Parámetros, callbacks, token exchange y ejemplos</span>
+                    </a>
+                    <a class="connect-link-card" href="https://github.com/PROVIWEB-App/PROVIWEB-Public.git">
+                        <strong>Repositorio público</strong>
+                        <span>Código base y guía para terceros</span>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
